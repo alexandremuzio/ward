@@ -37,16 +37,16 @@ class QueryAPI(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'  
         self.response.write('Query Api')
 
-class CheckAPI(webapp2.RequestHandler):
+class DeleteAPI(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/json'  
-        self.response.write('Check Api')
+        self.response.write('Delete Api')
 
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/search', SearchAPI),
     ('/insert', InsertAPI),
-    ('/check', CheckAPI), 
+    ('/delete', DeleteAPI), 
     ('/query', QueryAPI)
 ], debug=True)
