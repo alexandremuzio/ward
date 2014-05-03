@@ -59,16 +59,19 @@ class InsertAPI(webapp2.RequestHandler):
 
         # Check null atributes
         if not user_id or not post_id:
-            self.response.write("Null Atributes")
+            # self.response.write("Null Atributes")
             return
 
         self.response.write(check_ward(user_id, post_id))
         if not check_ward(user_id, post_id):
             ward = Ward(userid = user_id, postid = post_id)
             ward.put()
-            self.response.write("Post inserted")
-        else:
-            self.response.write("Post already exists")
+            # self.response.write("Post inserted")
+        # else:
+            # self.response.write("Post already exists")
+
+        self.response.write(json.dumps({"post_id" : post_id}))
+
 
     def get(self):
         self.error(405)
@@ -100,24 +103,25 @@ class DeleteAPI(webapp2.RequestHandler):
         user_id = self.request.get('user_id')
         post_id = self.request.get('post_id')
 
+        # To DO
         # Check null atributes
         if not user_id or not post_id:
-            self.response.write("Null Atributes")
+            self.response.write(json.dumps({"post_id" : post_id}))
+            # self.response.write("Null Atributes")
             return
 
-        print(post_id)
         wards = ndb.gql("SELECT * FROM Ward WHERE userid = '%(user_id)s' and postid = '%(post_id)s'" %{ "user_id" : user_id,
                                                                                                         "post_id" : post_id})
         # To Do
         if list(wards):
             for w in wards:
                 w.key.delete()
-                self.response.write("Post deleted")
-        else:
-            self.response.write("Post not found")
+                # self.response.write("Post deleted")
+        # else:
+            # self.response.write("Post not found")
 
         #Pensar no caso de deletar usuarios
-
+        self.response.write(json.dumps({"post_id" : post_id}))
 
         
         # self.redirect('/')
