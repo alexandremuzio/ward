@@ -62,7 +62,6 @@ class InsertAPI(webapp2.RequestHandler):
             # console.log("Null Atributes")
             return
 
-        self.response.write(check_ward(user_id, post_id))
         if not check_ward(user_id, post_id):
             ward = Ward(userid = user_id, postid = post_id)
             ward.put()
