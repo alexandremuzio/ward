@@ -13,8 +13,9 @@ import webapp2
 
 
 def check_ward (user_id, post_id) :
-    list = ndb.gql ("SELECT * FROM Ward WHERE userid = '%(user_id)s' AND postid = '%(post_id)s'"%{"user_id": user_id, "post_id" : post_id})
-    if not list:
+    lis = ndb.gql ("SELECT * FROM Ward WHERE userid = '%(user_id)s' AND postid = '%(post_id)s'"%{"user_id": user_id, "post_id" : post_id})
+    lis = list(lis)
+    if not lis:
         return False
     return True
 
@@ -34,57 +35,91 @@ class SearchAPI(webapp2.RequestHandler):
     def post(self):
         self.response.headers['Content-Type'] = 'application/json'  
         #self.response.write('Search Api')
-        userid = self.request.get('user_id', -1)
-        postid = self.request.get('post_id', -1)
-        if check_ward (userid, postid) :
-            self.response.write(json.dumps(["FALSE"]))
-        else :
-            self.response.write(json.dumps(["TRUE"]))
+        user_id = self.request.get('user_id')
+        post_id = self.request.get('post_id')
 
+        if not user_id or not post_id:
+            self.response.write("Null Atributes")
+            return
 
+        if check_ward(userid, postid):
+            self.response.write(json.dumps({'status' : 'true', 'post_id' : postid}))
+        else:
+            self.response.write(json.dumps({'status' : 'false', 'post_id' : postid}))
+
+    def get(self):
+        self.error(405)
 
 class InsertAPI(webapp2.RequestHandler):
     def post(self):
         self.response.headers['Content-Type'] = 'application/json'  
-        self.response.write('Insert Api')
+        self.response.write('Insert Api ')
         user_id = self.request.get('user_id')
         post_id = self.request.get('post_id')
-        ward = Ward(userid= user_id, postid= post_id)
-        ward.put()
-        self.response.write("User inserted")
-        # self.redirect('/')
+
+        # Check null atributes
+        if not user_id or not post_id:
+            self.response.write("Null Atributes")
+            return
+
+        self.response.write(check_ward(user_id, post_id))
+        if not check_ward(user_id, post_id):
+            ward = Ward(userid = user_id, postid = post_id)
+            ward.put()
+            self.response.write("Post inserted")
+        else:
+            self.response.write("Post already exists")
 
     def get(self):
         self.error(405)
 
 
 class QueryAPI(webapp2.RequestHandler):
-    def get(self):
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.write('Query Api')
 
     def post(self):
+        self.response.headers['Content-Type'] = 'application/json'
         user_id = self.request.get('user_id')
 
-        warded_posts = ndb.gql("SELECT postid FROM Ward WHERE userid = '%(user_id)s'"%{"user_id": user_id})
-        warded_posts = list(warded_posts)
+        # Check null atributes
+        if not user_id:
+            self.response.write("Null Atributes")
+            return
 
-        self.response.headers['Content-Type'] = 'application/json'
-        self.response.write(json.dumps(warded_posts))
+        warded_posts = ndb.gql("SELECT * FROM Ward WHERE userid = '%(user_id)s'"%{"user_id": user_id})
+        warded_postsID = [w.postid for w in warded_posts]
+
+        self.response.write(json.dumps(warded_postsID))
+
+    def get(self):
+        self.error(405)
 
 class DeleteAPI(webapp2.RequestHandler):
     def post(self):
         self.response.headers['Content-Type'] = 'application/json'  
-        self.response.write('Delete Api\n')
+        self.response.write('Delete Api ')
         user_id = self.request.get('user_id')
         post_id = self.request.get('post_id')
-        wards = ndb.gql("SELECT * FROM Ward WHERE userid = %(user_id)s and postid = %(post_id)s" %{ "user_id" : user_id,
-                                                                                                    "post_id" : post_id})
-        # To Do
-        for w in wards:
-            w.key.delete()
 
-        self.response.write("User deleted")
+        # Check null atributes
+        if not user_id or not post_id:
+            self.response.write("Null Atributes")
+            return
+
+        print(post_id)
+        wards = ndb.gql("SELECT * FROM Ward WHERE userid = '%(user_id)s' and postid = '%(post_id)s'" %{ "user_id" : user_id,
+                                                                                                        "post_id" : post_id})
+        # To Do
+        if list(wards):
+            for w in wards:
+                w.key.delete()
+                self.response.write("Post deleted")
+        else:
+            self.response.write("Post not found")
+
+        #Pensar no caso de deletar usuarios
+
+
+        
         # self.redirect('/')
     def get(self):
         self.error(405)
