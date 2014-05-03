@@ -11,7 +11,11 @@ import webapp2
 #     """Constructs a Datastore key for a Guestbook entity with guestbook_name."""
 #     return ndb.Key('Guestbook', guestbook_name)
 
-
+def check_ward (userid, postid) :
+    list = ndb.gql ("select * from Ward where userid = '%s' and postid = '%s'"%(userid, postid))
+    if not list:
+        return False
+    return True
 
 class Ward(ndb.Model):
     userid = ndb.StringProperty(required=True)
@@ -23,11 +27,7 @@ class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/json'
         self.response.out.write(json.dumps({'Hello' : 'World'}))
-def check_ward (userid, postid) :
-    list = ndb.gql ("select * from Ward where userid = '%s' and postid = '%s'"%(userid, postid))
-    if not list:
-        return False
-    return True
+
 
 class SearchAPI(webapp2.RequestHandler):
     def post(self):
@@ -45,10 +45,22 @@ class InsertAPI(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'application/json'  
         self.response.write('Insert Api')
+
 class QueryAPI(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'application/json'  
+        self.response.headers['Content-Type'] = 'application/json'
         self.response.write('Query Api')
+
+    def post(self):
+        user_id = self.request.get('user_id')
+
+        warded_posts = ndb.gql("select postid from Ward where userid = %(user_id)s"%{"user_id": user_id,
+                                                                                     "post_id": post_id})
+        warded_posts = list(warded_posts)
+
+
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(warded_posts))
 
 class DeleteAPI(webapp2.RequestHandler):
     def get(self):
