@@ -1,10 +1,10 @@
 {
 	"manifest_version": 2,
 
-	"name": "Facebook Ward",
+	"name": "FB Favorites",
 	"version": "1.0",
-	"description": "Use a ward para acompanhar os posts que mais lhe interessam no Facebook!",
-	"icons": { "128": "Ward.png" },
+	"description": "Use FB Favorites to follow the posts that most interest you!",
+	"icons": { "128": "favorite.png" },
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
   	"permissions": [ "<all_urls>", "tabs", "http://*/*", "https://*/*", "activeTab" ],
@@ -16,7 +16,7 @@
 
 	"browser_action": {
 		"default_title": "",
-		"default_icon": "Ward.png"
+		"default_icon": "favorite.png"
 	},	 
 
 	"content_scripts": [ {

@@ -1,7 +1,7 @@
 import cgi
 import urllib
 import json
-
+import datetime
 from google.appengine.api import users
 from google.appengine.ext import ndb
 import webapp2
@@ -12,12 +12,18 @@ import webapp2
 #     return ndb.Key('Guestbook', guestbook_name)
 
 
+
+
 def check_ward (user_id, post_id) :
     lis = ndb.gql ("SELECT * FROM Ward WHERE userid = '%(user_id)s' AND postid = '%(post_id)s'"%{"user_id": user_id, "post_id" : post_id})
     lis = list(lis)
     if not lis:
         return False
     return True
+
+def timedelta_to_microtime(tempo):
+    td = tempo - datetime.datetime(2014, 5, 2, 10, 20, 0, 0)
+    return td.microseconds + (td.seconds + td.days * 86400) * 1000000
 
 class Ward(ndb.Model):
     userid = ndb.StringProperty(required=True)
@@ -88,7 +94,8 @@ class QueryAPI(webapp2.RequestHandler):
             return
 
         warded_posts = ndb.gql("SELECT * FROM Ward WHERE userid = '%(user_id)s'"%{"user_id": user_id})
-        warded_postsID = [w.postid for w in warded_posts]
+
+        warded_postsID = [{'post_id': w.postid, 'time': timedelta_to_microtime(w.date) } for w in warded_posts]
 
         self.response.write(json.dumps(warded_postsID))
 

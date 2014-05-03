@@ -9,13 +9,13 @@ $(document).ready(
 			var y = JSON.parse($(".fbxWelcomeBoxBlock._8o._8s.lfloat._ohe").attr("data-gt"));
 			var USER = y.bmid.toString();
 			console.log("user is " + USER);
-			if($(this).attr("title") === "Ward this"){
+			if($(this).attr("title") === "Favorite this"){
 				console.log("CLIENT asks for server request insert");
 				chrome.runtime.sendMessage(
 					{code: "insert", user_id: USER, post_id: POSTID}
 				);
 			}
-			if($(this).attr("title") === "Unward this"){
+			if($(this).attr("title") === "Unfavorite this"){
 				console.log("CLIENT asks for server request delete");
 				chrome.runtime.sendMessage(
 					{code: "delete", user_id: USER, post_id: POSTID},
@@ -51,18 +51,17 @@ $(document).ready(
 				console.log("CLIENT executes");
 				if(data.status === "true"){
 					console.log("entrou no true");
-					$("#" + data.post_id).attr("title", "Unward this").html("Unward");
+					$("#" + data.post_id).attr("title", "Unfavorite this").html("Unfavorite");
 				}
 				else{
 					console.log("entrou no false");
 					console.log(data.post_id);
-					$("#" + data.post_id).attr("title", "Ward this").html("Ward");
+					$("#" + data.post_id).attr("title", "Favorite this").html("Favorite");
 
 
 				}
 			}
 		}
-
 
 		function createTag(){
 			$(this).append(" · ");
@@ -79,8 +78,6 @@ $(document).ready(
 			});
 			setTimeout(loadNewWardButtons, 100);
 		};
-
 		loadNewWardButtons();
-
 	}
 	);
