@@ -1,18 +1,22 @@
 var url = "http://steel-lacing-568.appspot.com/";
-
-function readMessage(request, sender, sendResponse){
-	console.log("BG receives message from " + sender);
+var i = 0;
+function readMessage(request, sender, callback){
+	console.log("BG receives message from ");
 
 	if(request.code === "search"){
-		console.log("BG executes search");
+		console.log("BG executes search" + i++);
 		$.post(url + "search", {user_id: request.user_id, post_id: request.post_id},
 			function(data){
-				var x = JSON.parse(data);
-				chrome.tabs.query({active: true, currentWindow: true},
+				console.log("BG search sending response" + (i - 1) + "  post_id: " + data.post_id);
+				chrome.tabs.query({url: '*://www.facebook.com/*'},
 					function(tabs) {
-				            chrome.tabs.sendMessage(tabs[0].id, {status: x.status, post_id: x.post_id, code: 'update'});
+				        for (var i = 0; i < tabs.length; i++) {
+				            chrome.tabs.sendMessage(tabs[i].id, {status: data.status, post_id: data.post_id, code: 'update'});
+				        }
 				    });
+				//chrome.runtime.sendMessage({status: data.status, post_id: data.post_id, code: 'update'});
 			});
+
 
 	} else if(request.code === "insert"){
 		console.log("BG executes insert");
@@ -21,7 +25,7 @@ function readMessage(request, sender, sendResponse){
 			chrome.tabs.query({url: '*://www.facebook.com/*'},
 				function(tabs) {
 			        for (var i = 0; i < tabs.length; i++) {
-			            chrome.tabs.sendMessage(tabs[i].id, {status: 'true', post_id: x.post_id, code: 'update'});
+			            chrome.tabs.sendMessage(tabs[i].id, {status: 'true', post_id: data.post_id, code: 'update'});
 			        }
 			    });
 		});
@@ -33,7 +37,7 @@ function readMessage(request, sender, sendResponse){
 			chrome.tabs.query({url: '*://www.facebook.com/*'},
 				function(tabs) {
 			        for (var i = 0; i < tabs.length; i++) {
-			            chrome.tabs.sendMessage(tabs[i].id, {status: 'false', post_id: x.post_id, code: 'update'});
+			            chrome.tabs.sendMessage(tabs[i].id, {status: 'false', post_id: data.post_id, code: 'update'});
 			        }
 			    });
 		});
@@ -43,3 +47,5 @@ function readMessage(request, sender, sendResponse){
 }
 
 chrome.runtime.onMessage.addListener(readMessage);
+
+console.log("tentou addListener");

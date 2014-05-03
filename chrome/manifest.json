@@ -5,11 +5,12 @@
 	"version": "1.0",
 	"description": "Use a ward para acompanhar os posts que mais lhe interessam no Facebook!",
 	"icons": { "128": "Ward.png" },
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
   	"permissions": [ "<all_urls>", "tabs", "http://*/*", "https://*/*", "activeTab" ],
 
 	"background": {
-    	"scripts": ["background.js"],
+    	"page" : "background.html",
     	"persistent": false
   	},
 
