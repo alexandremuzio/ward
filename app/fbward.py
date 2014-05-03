@@ -11,8 +11,8 @@ import webapp2
 #     """Constructs a Datastore key for a Guestbook entity with guestbook_name."""
 #     return ndb.Key('Guestbook', guestbook_name)
 
-def check_ward (userid, postid) :
-    list = ndb.gql ("select * from Ward where userid = '%s' and postid = '%s'"%(userid, postid))
+def check_ward (user_id, post_id) :
+    list = ndb.gql ("SELECT * FROM Ward WHERE userid = '%(user_id)s' AND postid = '%(post_id)s'"%{"user_id": user_id, "post_id" : post_id})
     if not list:
         return False
     return True
@@ -54,10 +54,8 @@ class QueryAPI(webapp2.RequestHandler):
     def post(self):
         user_id = self.request.get('user_id')
 
-        warded_posts = ndb.gql("select postid from Ward where userid = %(user_id)s"%{"user_id": user_id,
-                                                                                     "post_id": post_id})
+        warded_posts = ndb.gql("SELECT postid FROM Ward WHERE userid = '%(user_id)s'"%{"user_id": user_id})
         warded_posts = list(warded_posts)
-
 
         self.response.headers['Content-Type'] = 'application/json'
         self.response.write(json.dumps(warded_posts))
